@@ -54,10 +54,9 @@ pipeline {
 
     stage ('Checkout') {
       steps {
-        git ([branch: 'master',
+        git branch: 'master',
           credentialsId: git_credential,
           url: repository_url
-        ])
       }
     }
 
