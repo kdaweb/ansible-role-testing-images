@@ -9,6 +9,12 @@ pipeline {
     )
 
     string (
+      name: 'registry_url',
+      defaultValue: 'https://docker.io/',
+      description: 'the URL to the Docker registry where images will be pushed'
+    )
+
+    string (
       name: 'git_credential',
       defaultValue: 'github-wesley-dean',
       description: 'the ID of the credential to use to interact with GitHub'
@@ -22,20 +28,21 @@ pipeline {
 
     string (
       name: 'pattern',
-      defaultValue: 'kdaweb/ansible-%s-tester',
+      defaultValue: 'kdaweb/ansible-tester-%s',
       description: 'the printf pattern used to generate a name for the images'
     )
   }
 
   environment {
     repository_url = "$params.repository_url"
+    registry_url = "$params.registry_url"
     git_credential = "$params.git_credential"
     docker_credential = "$params.docker_credential"
     pattern = "$params.pattern"
   }
 
   triggers {
-    pollSCM()
+    pollSCM("@hourly")
   }
 
   options {
@@ -47,27 +54,35 @@ pipeline {
 
     stage ('Checkout') {
       steps {
-        git branch: 'master',
-        credentialsId: git_credential,
-        url: repository_url
+        git ([branch: 'master',
+          credentialsId: git_credential,
+          url: repository_url
+        ])
       }
     }
 
-    stage('Setup') {
+    stage('Build') {
       matrix {
         agent any
         axes {
           axis {
             name 'PLATFORM'
-            values 'alpine:latest', 'ubuntu:20.10', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:7', 'centos:8'
+            values 'alpine:latest', 'ubuntu:20.10', 'ubuntu:20.04', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:7', 'centos:8'
           }
         }
-      }
-    }
-
-    stage('Build') {
-      steps {
-        sh docker build -t "$(printf "$pattern" $PLATFORM)" -f "Dockerfile-$(echo "$PLATFORM" | tr -dc '[:alnum:]')".
+        stages {
+          stage('Build') {
+            steps {
+              script {
+                def dockerfilename = sh (script: "echo Dockerfile-$PLATFORM | tr -dc '[:alnum:]-')", returnStdout: true).trim()
+                docker.withRegistry("$registry_url", "$docker_credential") {
+                  image = docker.build("$pattern-$PLATFORM", "-f $dockerfilename .")
+                  image.push("$PLATFORM")
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
