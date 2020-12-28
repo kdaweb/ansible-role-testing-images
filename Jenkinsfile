@@ -73,7 +73,7 @@ pipeline {
           stage('Build') {
             steps {
               script {
-                def dockerfilename = sh (script: "echo Dockerfile-$PLATFORM | tr -dc '[:alnum:]-')", returnStdout: true).trim()
+                def dockerfilename = sh (script: "echo Dockerfile-$PLATFORM | tr -dc '[:alnum:]-'", returnStdout: true).trim()
                 docker.withRegistry("$registry_url", "$docker_credential") {
                   image = docker.build("$pattern-$PLATFORM", "-f $dockerfilename .")
                   image.push("$PLATFORM")
