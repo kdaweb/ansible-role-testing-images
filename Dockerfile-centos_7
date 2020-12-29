@@ -9,6 +9,16 @@ ARG ANSIBLE_VERSION
 ARG WORKDIR
 ARG BUILD_DATE=unknown
 ARG VSC_REF=unknown
+RUN [ ! -d "$WORKDIR" ] && mkdir -p "$WORKDIR"
+
+WORKDIR $WORKDIR
+
+# hadolint ignore=DL3033
+RUN yum install -y python3 python3-pip && yum clean all
+RUN pip3 install --no-cache-dir "ansible==$ANSIBLE_VERSION"
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
 
 LABEL os_image="$OS_IMAGE"
 LABEL os_version="$OS_VERSION"
@@ -20,14 +30,3 @@ LABEL url="https://kdaweb.com/"
 LABEL vcs-ref="$VCS_REF"
 LABEL build-date="$BUILD_DATE"
 LABEL docker.cmd="docker run --rm -it -v "$(pwd):/workdir" kdaweb/ansible-$ANSIBLE_VERSION-tester-$OS_IMAGE:$OS_VERSION"
-
-RUN [ ! -d "$WORKDIR" ] && mkdir -p "$WORKDIR"
-
-WORKDIR $WORKDIR
-
-# hadolint ignore=DL3033
-RUN yum install -y python3 python3-pip && yum clean all
-RUN pip3 install --no-cache-dir "ansible==$ANSIBLE_VERSION"
-
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT [ "/entrypoint.sh" ]
