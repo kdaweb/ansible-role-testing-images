@@ -1,9 +1,25 @@
 ARG OS_VERSION=20.10
 ARG OS_IMAGE=ubuntu
 ARG ANSIBLE_VERSION=2.9
+ARG WORKDIR=/workdir
 
 FROM $OS_IMAGE:$OS_VERSION
 ARG ANSIBLE_VERSION
+ARG WORKDIR
+ARG OS_IMAGE
+ARG OS_VERSION
+
+LABEL os_image="$OS_IMAGE"
+LABEL os_version="$OS_VERSION"
+LABEL ansible_version="$ANSIBLE_VERSION"
+LABEL maintainer="info@kdaweb.com"
+LABEL name="Ansible test image"
+LABEL description="A Docker image for Ansible v$ANSIBLE_VERSION $OS_IMAGE:$OS_VERSION"
+LABEL url="https://kdaweb.com/"
+
+RUN [ ! -d "$WORKDIR" ] && mkdir -p "$WORKDIR"
+
+WORKDIR $WORKDIR
 
 # hadolint ignore=DL3008
 RUN apt-get update \
@@ -18,3 +34,6 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir "ansible==$ANSIBLE_VERSION"
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
