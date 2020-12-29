@@ -31,6 +31,12 @@ pipeline {
       defaultValue: '2.9',
       description: 'the version of Ansible to install'
     )
+
+    string (
+      name: 'pattern',
+      defaultValue: 'wesleydean/ansible-%s-tester-%s',
+      description: 'the printf pattern to use to name the images'
+    )
   }
 
   environment {
@@ -39,6 +45,7 @@ pipeline {
     git_credential = "$params.git_credential"
     docker_credential = "$params.docker_credential"
     ansible_version = "$params.ansible_version"
+    pattern = "$params.pattern"
   }
 
   triggers {
@@ -75,7 +82,7 @@ pipeline {
             steps {
               script {
                 def dockerfilename = sh (script: "echo Dockerfile-$PLATFORM | tr ':' '_'", returnStdout: true).trim()
-                def imagetag = sh (script: "echo wesleydean/ansible-$ansible_version-tester-$PLATFORM", returnStdout: true).trim()
+                def imagetag = sh (script: "printf $pattern $ansible_version $PLATFORM", returnStdout: true).trim()
                 def build_date = sh (script: "date -u +'%Y-%m-%dT%H:%M:%SZ'", returnStdout: true).trim()
                 docker.withRegistry("$registry_url", "$docker_credential") {
                   image = docker.build("$imagetag", "--build-arg ANSIBLE_VERSION=$ansible_version --build-arg BUILD_DATE=$build_date --build-arg VCSREF=$GIT_COMMIT -f $dockerfilename .")
