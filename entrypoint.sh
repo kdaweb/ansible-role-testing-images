@@ -7,10 +7,6 @@ if [ -z "$connection" ] ; then
   connection="local"
 fi
 
-if [ -z "$WORKSPACE" ] ; then
-  WORKSPACE="$workdir"
-fi
-
 echo "Testing '$rolename'"
 
 ln -fs "$workdir" "/$rolename"
@@ -22,5 +18,4 @@ ansible-playbook \
   --check \
   --inventory tests/inventory \
   tests/test.yml \
-  "$@" \
-| sed -Ee "s|$workdir|$WORKSPACE|g"
+  "$@"
