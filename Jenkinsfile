@@ -10,7 +10,7 @@ pipeline {
 
     string (
       name: 'registry_url',
-      defaultValue: 'https://docker.io/',
+      defaultValue: 'https://registry.hub.docker.com',
       description: 'the URL to the Docker registry where images will be pushed'
     )
 
