@@ -8,6 +8,8 @@ ARG ANSIBLE_VERSION
 ARG WORKDIR
 ARG OS_IMAGE
 ARG OS_VERSION
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
 
 LABEL os_image="$OS_IMAGE"
 LABEL os_version="$OS_VERSION"
@@ -16,6 +18,9 @@ LABEL maintainer="info@kdaweb.com"
 LABEL name="Ansible test image"
 LABEL description="A Docker image for Ansible v$ANSIBLE_VERSION $OS_IMAGE:$OS_VERSION"
 LABEL url="https://kdaweb.com/"
+LABEL vcs-ref="$VCS_REF"
+LABEL build-date="$BUILD_DATE"
+LABEL docker.cmd="docker run --rm -it -v "$(pwd):/workdir" kdaweb/ansible-$ANSIBLE_VERSION-tester-$OS_IMAGE:$OS_VERSION"
 
 RUN [ ! -d "$WORKDIR" ] && mkdir -p "$WORKDIR"
 
