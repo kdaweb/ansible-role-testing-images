@@ -49,7 +49,7 @@ pipeline {
   }
 
   triggers {
-    pollSCM("@hourly")
+    pollSCM("H/15 * * * *")
   }
 
   options {
