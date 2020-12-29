@@ -1,3 +1,20 @@
-FROM ubuntu:21.04
+ARG OS_VERSION=21.04
+ARG OS_IMAGE=ubuntu
+ARG ANSIBLE_VERSION=2.9
 
-RUN apt-get update && apt-get install -fy python3 python3-pip && pip install ansible
+FROM $OS_IMAGE:$OS_VERSION
+ARG ANSIBLE_VERSION
+
+# hadolint ignore=DL3008
+RUN apt-get update \
+  && apt-get install --no-install-recommends -fy \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir "ansible==$ANSIBLE_VERSION"

@@ -27,8 +27,14 @@ pipeline {
     )
 
     string (
+      name: 'ansible_version',
+      defaultValue: '2.9',
+      description: 'the version of Ansible to install'
+    )
+
+    string (
       name: 'pattern',
-      defaultValue: 'kdaweb/ansible-tester-%s',
+      defaultValue: 'kdaweb/ansible-%s-tester-%s',
       description: 'the printf pattern used to generate a name for the images'
     )
   }
@@ -39,6 +45,7 @@ pipeline {
     git_credential = "$params.git_credential"
     docker_credential = "$params.docker_credential"
     pattern = "$params.pattern"
+    ansible_version = "$params.ansible_version"
   }
 
   triggers {
@@ -66,18 +73,19 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'alpine:latest', 'ubuntu:20.10', 'ubuntu:20.04', 'ubuntu:18.04', 'ubuntu:16.04', 'centos:7', 'centos:8'
+            values 'alpine:3.12', 'ubuntu:20.10', 'ubuntu:20.04', 'ubuntu:18.04', 'ubuntu:21.04', 'centos:7', 'centos:8'
           }
         }
+
         stages {
           stage('Build') {
             steps {
               script {
                 def dockerfilename = sh (script: "echo Dockerfile-$PLATFORM | tr ':' '_'", returnStdout: true).trim()
-                def imagetag = sh (script: "printf $pattern $PLATFORM", returnStdout: true).trim()
+                def imagetag = sh (script: "printf $pattern $ansible_version $PLATFORM", returnStdout: true).trim()
                 docker.withRegistry("$registry_url", "$docker_credential") {
-                  image = docker.build("$imagetag", "-f $dockerfilename .")
-                  image.push("$PLATFORM")
+                  image = docker.build("$imagetag", "--build-arg ANSIBLE_VERSION=$ansible_version -f $dockerfilename .")
+                  image.push("$imagetag")
                 }
               }
             }
