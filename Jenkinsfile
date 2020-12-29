@@ -79,7 +79,7 @@ pipeline {
                 def build_date = sh (script: "date -u +'%Y-%m-%dT%H:%M:%SZ'", returnStdout: true).trim()
                 docker.withRegistry("$registry_url", "$docker_credential") {
                   image = docker.build("$imagetag", "--build-arg ANSIBLE_VERSION=$ansible_version --build-arg BUILD_DATE=$build_date --build-arg VCSREF=$GIT_COMMIT -f $dockerfilename .")
-                  image.push("$imagetag")
+                  image.push()
                 }
               }
             }
