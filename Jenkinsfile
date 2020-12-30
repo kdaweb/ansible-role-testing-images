@@ -73,7 +73,7 @@ pipeline {
         axes {
           axis {
             name 'PLATFORM'
-            values 'alpine:3.12', 'ubuntu:20.10', 'ubuntu:20.04', 'ubuntu:18.04', 'ubuntu:21.04', 'centos:7', 'centos:8'
+            values 'alpine:3.12', 'ubuntu:20.10', 'ubuntu:20.04', 'ubuntu:18.04', 'ubuntu:21.04', 'centos:7', 'centos:8', 'amazonlinux:2'
           }
         }
 
