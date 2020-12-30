@@ -75,4 +75,16 @@ ansible-playbook \
 | tee "$logfile" \
 | sed -Ee "s|/($rolename)(/.*)|$WORKSPACE/\1\2|g"
 
-grep -qE 'failed=0' "$logfile"
+if [ "$operation" = "--syntax-check" ] \
+&& grep -qE 'ERROR:' "$logfile" ; then
+  exit 1
+elif [ ! "$operation" = "--syntax-check" ] \
+&& grep -qE 'failed=0' "$logfile" ; then
+  exit 0
+fi
+
+# if we get here, either we're in syntax mode and
+# we found 'ERROR:' or we're not in syntax mode
+# and we did Not find 'failed=0', so.. something
+# failed.
+exit 1
