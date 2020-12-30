@@ -17,7 +17,7 @@ WORKDIR $WORKDIR
 RUN yum install -y python3 python3-pip && yum clean all
 RUN pip3 install --no-cache-dir "ansible==$ANSIBLE_VERSION"
 
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh README.md /
 ENTRYPOINT [ "/entrypoint.sh" ]
 
 LABEL os_image="$OS_IMAGE"
@@ -29,4 +29,4 @@ LABEL description="A Docker image for Ansible v$ANSIBLE_VERSION $OS_IMAGE:$OS_VE
 LABEL url="https://kdaweb.com/"
 LABEL vcs-ref="$VCS_REF"
 LABEL build-date="$BUILD_DATE"
-LABEL docker.cmd="docker run --rm -it -v "$(pwd):/workdir" kdaweb/ansible-$ANSIBLE_VERSION-tester-$OS_IMAGE:$OS_VERSION"
+LABEL docker.cmd="docker run --rm -it -v "$(pwd):/workdir" wesleydean/ansible-$ANSIBLE_VERSION-tester-$OS_IMAGE:$OS_VERSION"
