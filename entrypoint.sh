@@ -53,8 +53,8 @@ color="${color:-true}"
 rolespath="${rolespath:-..}"
 
 case "$runtype" in
-  [Rr]*) operation="" ;;
-  [Cc]*) operation="--check" ;;
+  [RrEe]*) operation="" ;;
+  [CcDd]*) operation="--check" ;;
   [Ss]*) operation="--syntax-check" ;;
   *) operation="--check" ;;
 esac
