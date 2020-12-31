@@ -75,12 +75,18 @@ ansible-playbook \
 | tee "$logfile" \
 | sed -Ee "s|/($rolename)(/.*)|$WORKSPACE/\1\2|g"
 
-if [ "$operation" = "--syntax-check" ] \
-&& grep -qE 'ERROR:' "$logfile" ; then
-  exit 1
-elif [ ! "$operation" = "--syntax-check" ] \
-&& grep -qE 'failed=0' "$logfile" ; then
-  exit 0
+if [ "$operation" = "--syntax-check" ] ; then
+  if grep -qE 'ERROR:' "$logfile" ; then
+    exit 1
+  else
+    exit 0
+  fi
+elif [ ! "$operation" = "--syntax-check" ] ; then
+  if grep -qE 'failed=0' "$logfile" ; then
+    exit 0
+  else
+    exit 1
+  fi
 fi
 
 # if we get here, either we're in syntax mode and
